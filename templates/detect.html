@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Sign Detection - Detection Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .upload-section {
+            padding: 4rem 0;
+            background-color: #f8f9fa;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .drop-zone {
+            width: 100%;
+            height: 300px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #666;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone--over {
+            border-color: #000;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .drop-zone__input {
+            display: none;
+        }
+
+        .drop-zone__thumb {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #cccccc;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .drop-zone__thumb::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px 0;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.75);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .drop-zone__prompt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .drop-zone__icon {
+            font-size: 3rem;
+            color: #666;
+        }
+
+        /* Modal styles */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .modal-header {
+            margin-bottom: 1rem;
+        }
+
+        .modal-preview-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-confirm {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirm:hover {
+            background: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">Traffic Sign Detection</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/detect">Detection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Upload Section -->
+    <section class="upload-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <h1 class="text-center mb-4">Upload Traffic Sign Image</h1>
+                    <p class="text-center text-muted mb-5">Drag and drop your image or click to select</p>
+                    
+                    <form method="POST" enctype="multipart/form-data" id="upload-form">
+                        <div class="drop-zone">
+                            <span class="drop-zone__prompt">
+                                <i class="fas fa-cloud-upload-alt drop-zone__icon"></i>
+                                <span>Drop your image here or click to upload</span>
+                            </span>
+                            <input type="file" name="file" class="drop-zone__input" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if result_img %}
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-8">
+                    <h2 class="text-center mb-4">Detection Result</h2>
+                    <img src="{{ url_for('static', filename=result_img) }}" alt="Detection Result" class="img-fluid rounded shadow">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Preview Modal -->
+    <div class="preview-modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Upload Confirmation</h4>
+                <p class="text-muted">Please verify the image before detection</p>
+            </div>
+            <img src="" alt="Preview" class="modal-preview-image" id="modalPreviewImage">
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmUpload()">Upload & Detect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Drag and Drop Script -->
+    <script>
+        let currentFile = null;
+
+        document.querySelectorAll(".drop-zone").forEach(dropZone => {
+            const input = dropZone.querySelector(".drop-zone__input");
+
+            dropZone.addEventListener("click", () => {
+                input.click();
+            });
+
+            input.addEventListener("change", (e) => {
+                if (input.files.length) {
+                    handleFile(input.files[0]);
+                }
+            });
+
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("drop-zone--over");
+            });
+
+            ["dragleave", "dragend"].forEach(type => {
+                dropZone.addEventListener(type, () => {
+                    dropZone.classList.remove("drop-zone--over");
+                });
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("drop-zone--over");
+
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        function handleFile(file) {
+            if (file.type.startsWith("image/")) {
+                currentFile = file;
+                updateThumbnail(document.querySelector(".drop-zone"), file);
+                showPreviewModal(file);
+            } else {
+                alert("Please upload an image file!");
+            }
+        }
+
+        function showPreviewModal(file) {
+            const modal = document.getElementById("previewModal");
+            const previewImage = document.getElementById("modalPreviewImage");
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            
+            modal.classList.add("show");
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("previewModal");
+            modal.classList.remove("show");
+            
+            // Reset the upload form
+            document.getElementById("upload-form").reset();
+            resetDropZone();
+        }
+
+        function confirmUpload() {
+            if (currentFile) {
+                document.getElementById("upload-form").submit();
+            }
+        }
+
+        function resetDropZone() {
+            const dropZone = document.querySelector(".drop-zone");
+            const thumb = dropZone.querySelector(".drop-zone__thumb");
+            
+            if (thumb) {
+                thumb.remove();
+            }
+            
+            const prompt = document.createElement("span");
+            prompt.classList.add("drop-zone__prompt");
+            prompt.innerHTML = `
+                <i class="fas fa-cloud-upload-alt drop-zone__icon"></i>
+                <span>Drop your image here or click to upload</span>
+            `;
+            
+            dropZone.appendChild(prompt);
+        }
+
+        function updateThumbnail(dropZone, file) {
+            let thumbnailElement = dropZone.querySelector(".drop-zone__thumb");
+
+            if (dropZone.querySelector(".drop-zone__prompt")) {
+                dropZone.querySelector(".drop-zone__prompt").remove();
+            }
+
+            if (!thumbnailElement) {
+                thumbnailElement = document.createElement("div");
+                thumbnailElement.classList.add("drop-zone__thumb");
+                dropZone.appendChild(thumbnailElement);
+            }
+
+            thumbnailElement.dataset.label = file.name;
+
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+                };
+            } else {
+                thumbnailElement.style.backgroundImage = null;
+            }
+        }
+    </script>
+</body>
+</html> 
