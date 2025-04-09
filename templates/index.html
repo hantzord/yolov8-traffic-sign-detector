@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deteksi Rambu</title>
+</head>
+<body>
+    <h1>Upload Gambar Rambu</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    {% if result_img %}
+        <h2>Hasil Deteksi:</h2>
+        <img src="{{ url_for('static', filename=result_img) }}" alt="Hasil Deteksi">
+    {% endif %}
+</body>
+</html>
