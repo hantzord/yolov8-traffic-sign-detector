@@ -20,6 +20,9 @@ os.makedirs(app.config['CROPS_FOLDER'], exist_ok=True)
 # Load model YOLOv8
 model = YOLO('rambu_yolov8_model/weights/best.pt')
 
+# Gunakan environment variable untuk API key
+WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')
+
 # Route untuk assets
 @app.route('/assets/<path:filename>')
 def serve_assets(filename):
@@ -27,7 +30,7 @@ def serve_assets(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', weather_api_key=WEATHER_API_KEY)
 
 @app.route('/detect', methods=['GET', 'POST'])
 def detect():

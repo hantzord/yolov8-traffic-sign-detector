@@ -64,7 +64,6 @@ body {
     max-width: 600px;
     position: relative;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    aspect-ratio: 16/9;
 }
 
 .btn-explore {
@@ -85,8 +84,67 @@ body {
 
 .weather-info {
     margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.time {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+.date-weather-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.date {
     color: #666;
     font-size: 0.9rem;
+}
+
+.weather {
+    color: #666;
+    font-weight: 400;
+    font-size: 0.9rem;
+    position: relative;
+    padding-left: 15.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.weather::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 15rem;
+    height: 1px;
+    background-color: #666;
+    transform: translateY(-50%);
+}
+
+.read-more {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.read-more svg {
+    width: 20px;
+    height: 20px;
+    transform: rotate(90deg);
 }
 
 /* Responsive Styles */
@@ -138,7 +196,19 @@ body {
     }
     
     .weather-info {
-        text-align: center;
+        align-items: center;
+    }
+    
+    .date-weather-container {
+        justify-content: center;
+    }
+    
+    .weather::before {
+        width: 2.5rem;
+    }
+    
+    .weather {
+        padding-left: 3rem;
     }
 }
 
@@ -166,5 +236,39 @@ body {
     .btn-explore {
         padding: 0.7rem 1.5rem;
         font-size: 0.9rem;
+    }
+    
+    /* Untuk layar kecil tapi tidak terlalu kecil, tetap tampilkan garis horizontal */
+    @media (min-width: 400px) {
+        .date-weather-container {
+            gap: 1rem;
+        }
+        
+        .weather {
+            padding-left: 2.5rem;
+        }
+        
+        .weather::before {
+            width: 2rem;
+            display: block;
+        }
+    }
+    
+    /* Untuk layar sangat kecil, tampilkan secara vertikal */
+    @media (max-width: 399px) {
+        .date-weather-container {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .weather {
+            padding-left: 0;
+            margin-top: 0.25rem;
+        }
+        
+        .weather::before {
+            display: none;
+        }
     }
 } 
