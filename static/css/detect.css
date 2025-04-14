@@ -434,6 +434,20 @@
     100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
 }
 
+/* Result Image Styling */
+.detection-result-img {
+    max-width: 90%;
+    margin: 0 auto;
+    display: block;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.detection-result-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
 @media (max-width: 768px) {
     .settings-panel {
         padding: 12px;
