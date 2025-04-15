@@ -219,6 +219,73 @@ def redetect():
     
     return redirect(url_for('detect'))
 
+@app.route('/camera-detect', methods=['GET', 'POST'])
+def camera_detect():
+    """Route for real-time camera detection page"""
+    conf_threshold = float(request.args.get('conf_threshold', DEFAULT_CONF_THRESHOLD))
+    return render_template('camera_detect.html', conf_threshold=conf_threshold)
+
+@app.route('/process-frame', methods=['POST'])
+def process_frame():
+    """API endpoint to process a single frame from camera"""
+    if 'frame' not in request.files:
+        return {'error': 'No frame data provided'}, 400
+    
+    # Get the image frame
+    frame_file = request.files['frame']
+    conf_threshold = float(request.form.get('conf_threshold', DEFAULT_CONF_THRESHOLD))
+    
+    # Generate unique filename for the frame
+    frame_id = uuid.uuid4().hex
+    frame_path = os.path.join(app.config['UPLOAD_FOLDER'], f"frame_{frame_id}.jpg")
+    frame_file.save(frame_path)
+    
+    # Process detection using YOLOv8
+    results = model(frame_path, conf=conf_threshold)
+    result = results[0]
+    
+    # Create response data
+    detected_signs = []
+    
+    # If we detected signs
+    if len(result.boxes) > 0:
+        # Load image for cropping
+        img = cv2.imread(frame_path)
+        
+        for i, box in enumerate(result.boxes):
+            # Get box coordinates
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            
+            # Get sign class and confidence
+            sign_class = result.names[int(box.cls[0])]
+            confidence = float(box.conf[0])
+            
+            # Get sign information
+            sign_info = TRAFFIC_SIGNS.get(sign_class, {
+                'name': sign_class,
+                'description': 'Informasi tidak tersedia',
+                'law': 'Informasi tidak tersedia'
+            })
+            
+            # Add to detected signs
+            detected_signs.append({
+                'class': sign_class,
+                'name': sign_info['name'],
+                'description': sign_info['description'],
+                'law': sign_info['law'],
+                'confidence': confidence,
+                'box': [x1, y1, x2, y2]
+            })
+    
+    # Clean up the temporary frame file
+    if os.path.exists(frame_path):
+        os.remove(frame_path)
+    
+    return {
+        'success': True,
+        'signs': detected_signs
+    }
+
 @app.route('/', methods=['GET', 'POST'])
 def index_post():
     result_img = None

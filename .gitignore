@@ -1,0 +1,11 @@
+# Folder untuk menyimpan hasil crop, results, uploads, dan originals
+static/crops/
+static/results/
+static/uploads/
+static/originals/
+
+# Tetap pertahankan folder dengan file .gitkeep
+!static/crops/.gitkeep
+!static/results/.gitkeep
+!static/uploads/.gitkeep
+!static/originals/.gitkeep
