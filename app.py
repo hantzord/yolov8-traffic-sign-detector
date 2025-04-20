@@ -22,9 +22,6 @@ os.makedirs(app.config['ORIGINAL_FOLDER'], exist_ok=True)  # Buat folder origina
 # Load model YOLOv8
 model = YOLO('rambu_yolov8_model/weights/best.pt')
 
-# Gunakan environment variable untuk API key
-WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')
-
 # Default confidence threshold
 DEFAULT_CONF_THRESHOLD = 0.25
 
@@ -35,7 +32,7 @@ def serve_assets(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html', weather_api_key=WEATHER_API_KEY)
+    return render_template('index.html')
 
 @app.route('/detect', methods=['GET', 'POST'])
 def detect():
@@ -241,6 +238,10 @@ def index_post():
             result_img = f'results/{unique_filename}'
 
     return render_template('index.html', result_img=result_img)
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
