@@ -1,0 +1,6 @@
+flask==2.3.3
+werkzeug==2.3.7
+ultralytics==8.0.196
+opencv-python-headless==4.8.1.78
+numpy>=1.22.2
+gunicorn==21.2.0 
